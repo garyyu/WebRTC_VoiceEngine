@@ -17,7 +17,7 @@
 #ifndef __WRTC_VOICE_ENGINE_H__
 #define __WRTC_VOICE_ENGINE_H__
 
-#define _WEBRTC_API_EXPORTS
+#define _WEBRTC_API_EXPORTS	// For DLL Building.
 #define _WEBRTC_FOR_PC
 
 #ifdef  _WEBRTC_API_EXPORTS
@@ -55,7 +55,7 @@ typedef struct webrtc_ec
 /*                              Main AEC API                            */
 /************************************************************************/
 
-int		webrtc_aec_create(
+extern "C" int  WEBRTC_API		webrtc_aec_create(
                         unsigned clock_rate,
                         unsigned channel_count,
                         unsigned samples_per_frame,
@@ -63,12 +63,13 @@ int		webrtc_aec_create(
                         unsigned options,
                         void **p_echo );
 
-int		webrtc_aec_destroy(void *state );
+extern "C" int  WEBRTC_API		webrtc_aec_destroy(void *state );
 
-void	webrtc_aec_reset(void *state );
-int		webrtc_aec_cancel_echo(void *state,
+extern "C" void WEBRTC_API		webrtc_aec_reset(void *state );
+extern "C" int  WEBRTC_API		webrtc_aec_cancel_echo(void *state,
                         int16_t *rec_frm,
                         const int16_t *play_frm,
+						unsigned framing,
                         unsigned options,
                         void *reserved );
 
@@ -77,16 +78,16 @@ int		webrtc_aec_cancel_echo(void *state,
 /*                              Main Resampler API                      */
 /************************************************************************/
 
-int		webrtc_resampler_create(
+extern "C" int WEBRTC_API		webrtc_resampler_create(
                         int inFreq, 
 						int outFreq,
 						void **p_resampler
 						);
 
-int		webrtc_resampler_destroy(void *state );
+extern "C" int WEBRTC_API		webrtc_resampler_destroy(void *state );
 
-int		webrtc_resampler_reset( void *state, int inFreq, int outFreq );
-int		webrtc_resampler_process(void *state,
+extern "C" int WEBRTC_API		webrtc_resampler_reset( void *state, int inFreq, int outFreq );
+extern "C" int WEBRTC_API		webrtc_resampler_process(void *state,
                         const int16_t* samplesIn, 
 						int lengthIn, 
 						int16_t* samplesOut,

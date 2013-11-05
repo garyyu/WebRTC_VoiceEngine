@@ -52,6 +52,7 @@ typedef uint16_t            WebRtc_UWord16;
 typedef uint32_t            WebRtc_UWord32;
 typedef uint64_t            WebRtc_UWord64;
 
+#define MAX_FRAMING 960		// 60ms@16kHz = 960
 
 /*
 class WebRTCVoiceEngineImpl:public WebRTCVoiceEngine

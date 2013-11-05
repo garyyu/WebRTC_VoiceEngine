@@ -27,7 +27,7 @@
 #endif
 
 #ifndef WEBRTC_NS_POLICY
-    #define WEBRTC_NS_POLICY 0
+    #define WEBRTC_NS_POLICY 2	//0: Mild, 1: Medium , 2: Aggressive
 #endif
 
 #if WEBRTC_AEC_USE_MOBILE == 1
@@ -59,6 +59,8 @@
 #define VALIDATE 
 #endif
 
+#define SAFE_FREE(p)	{ if (p) { free(p); p=NULL; } }
+
 bool webrtc_use_ns = WEBRTC_USE_NS;
 
 //-----------------------------------------------------------------------------------
@@ -72,7 +74,7 @@ static void _print_webrtc_aec_error(const char* filename, int linenum, const cha
 /*
  * Create the AEC.
  */
-int webrtc_aec_create(
+extern "C" int WEBRTC_API webrtc_aec_create(
 				     unsigned clock_rate,
 				     unsigned channel_count,
 				     unsigned samples_per_frame,
@@ -175,9 +177,9 @@ int webrtc_aec_create(
     echo->blockLen10ms = (10 * channel_count * clock_rate / 1000);
 
     /* Create temporary frames for echo cancellation */
-    echo->tmp_frame = (int16_t*) malloc(2*samples_per_frame);
+    echo->tmp_frame  = (int16_t*) malloc(sizeof(int16_t)*MAX_FRAMING);
     assert(echo->tmp_frame != NULL);
-    echo->tmp_frame2 = (int16_t*) malloc(2*samples_per_frame);
+    echo->tmp_frame2 = (int16_t*) malloc(sizeof(int16_t)*MAX_FRAMING);
     assert(echo->tmp_frame2 != NULL);
 
     /* Done */
@@ -189,7 +191,7 @@ int webrtc_aec_create(
 /*
  * Destroy AEC
  */
-int webrtc_aec_destroy(void *state )
+extern "C" int WEBRTC_API webrtc_aec_destroy(void *state )
 {
     webrtc_ec *echo = (webrtc_ec*) state;
     assert(echo);
@@ -202,8 +204,10 @@ int webrtc_aec_destroy(void *state )
         WebRtcNs_Free((NsHandle *)echo->NS_inst);
         echo->NS_inst = NULL;
     }
+    if (echo->tmp_frame ) SAFE_FREE(echo->tmp_frame );
+    if (echo->tmp_frame2) SAFE_FREE(echo->tmp_frame2);
 
-	free(echo);
+	SAFE_FREE(echo);
 
     return 0;
 }
@@ -212,7 +216,7 @@ int webrtc_aec_destroy(void *state )
 /*
  * Reset AEC
  */
-void webrtc_aec_reset(void *state )
+extern "C" void WEBRTC_API webrtc_aec_reset(void *state )
 {
     webrtc_ec *echo = (webrtc_ec*) state;
     assert(echo != NULL);
@@ -254,9 +258,10 @@ void webrtc_aec_reset(void *state )
 /*
  * Perform echo cancellation.
  */
-int webrtc_aec_cancel_echo( void *state,
+extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 					   int16_t *rec_frm,
 					   const int16_t *play_frm,
+					   unsigned framing,
 					   unsigned options,
 					   void *reserved )
 {
@@ -266,6 +271,10 @@ int webrtc_aec_cancel_echo( void *state,
 
     /* Sanity checks */
     assert(echo && rec_frm && play_frm && options==0 && reserved==NULL);
+	if ((echo==NULL) || (rec_frm==NULL) || (play_frm==NULL) || (framing>MAX_FRAMING)){
+		return -1;
+	}
+	echo->samples_per_frame = framing;	//for better flexibility, framing can be changed dynamically.
 
 	tail_factor = echo->samples_per_frame / echo->blockLen10ms;
     for(i=0; i < echo->samples_per_frame; i+= echo->blockLen10ms) {
@@ -326,7 +335,7 @@ int webrtc_aec_cancel_echo( void *state,
  *					WebRTC Resampler API                                                      *
  **********************************************************************************************/
 
-int		webrtc_resampler_create(
+extern "C" int	WEBRTC_API webrtc_resampler_create(
                         int inFreq, 
 						int outFreq,
 						void **p_resampler
@@ -341,7 +350,7 @@ int		webrtc_resampler_create(
 	return 0;
 }
 
-int		webrtc_resampler_destroy( void *state )
+extern "C" int	WEBRTC_API webrtc_resampler_destroy( void *state )
 {
 	Resampler * p_objResampler = (Resampler *)state;
 	if (p_objResampler!=NULL){
@@ -352,7 +361,7 @@ int		webrtc_resampler_destroy( void *state )
 		return -1;
 }
 
-int		webrtc_resampler_reset(void *state, int inFreq, int outFreq)
+extern "C" int	WEBRTC_API webrtc_resampler_reset(void *state, int inFreq, int outFreq)
 {
 	Resampler * p_objResampler = (Resampler *)state;
 	if (p_objResampler!=NULL){
@@ -363,7 +372,7 @@ int		webrtc_resampler_reset(void *state, int inFreq, int outFreq)
 		return -1;
 }
 
-int		webrtc_resampler_process(void *state,
+extern "C" int	WEBRTC_API webrtc_resampler_process(void *state,
                         const int16_t* samplesIn, 
 						int lengthIn, 
 						int16_t* samplesOut,

@@ -1,4 +1,3 @@
-//#ifdef _DEBUG
 
 #include <Windows.h>
 #include <iostream>
@@ -9,6 +8,8 @@
 #include "webrtc_voe.h"
 
 #include "wasapi.h"
+
+#if	!defined(_WEBRTC_API_EXPORTS)
 
 using namespace std;
 
@@ -146,6 +147,7 @@ void LocalFileTest()
 		if (0 != webrtc_aec_cancel_echo( echo,
 						   nearend_buffer,	// rec_frm
 						   farend_buffer,	// play_frm
+						   samples_per_frame,
 						   0,	// options
 						   NULL	// reserved 
 						   ) )
@@ -379,6 +381,7 @@ void RealTimeDialogTest()
 				if (0 != webrtc_aec_cancel_echo( echo,
 								   nearend_buffer,	// rec_frm
 								   farend_buffer,	// play_frm
+								   samples_per_frame,
 								   0,	// options
 								   NULL	// reserved 
 								   ) )
@@ -555,4 +558,4 @@ Exit:
 	return;
 }
 
-//#endif
+#endif	//_WEBRTC_API_EXPORTS
