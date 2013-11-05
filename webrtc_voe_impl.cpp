@@ -17,13 +17,12 @@
 #include "webrtc_voe_impl.h"
 #include "common_audio/resampler/include/resampler.h"
 
-
-#ifndef WEBRTC_USE_NS
-	#define WEBRTC_USE_NS VOE_FALSE
+#ifndef WEBRTC_AEC_AGGRESSIVENESS
+    #define WEBRTC_AEC_AGGRESSIVENESS kAecNlpAggressive	//kAecNlpConservative, kAecNlpModerate, kAecNlpAggressive
 #endif
 
-#ifndef WEBRTC_AEC_AGGRESSIVENESS
-    #define WEBRTC_AEC_AGGRESSIVENESS kAecNlpModerate
+#ifndef WEBRTC_USE_NS
+	#define WEBRTC_USE_NS VOE_FALSE	//True: Enable NS, False: Disable NS.
 #endif
 
 #ifndef WEBRTC_NS_POLICY
@@ -278,18 +277,6 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 
 	tail_factor = echo->samples_per_frame / echo->blockLen10ms;
     for(i=0; i < echo->samples_per_frame; i+= echo->blockLen10ms) {
-    	if(echo->NS_inst){
-			/* Noise suppression */
-			status = WebRtcNs_Process((NsHandle *)echo->NS_inst,
-									  (WebRtc_Word16 *) (&rec_frm[i]),
-									  NULL,
-									  (WebRtc_Word16 *) (&echo->tmp_frame[i]),
-									  NULL);
-			if (status != 0) {
-				printf("%s:%d-Error suppressing noise", __FILE__, __LINE__);
-				return -1;
-			}
-    	}
 
 		/* Feed farend buffer */
 		status = W_WebRtcAec_BufferFarend(echo->AEC_inst, &play_frm[i], echo->blockLen10ms);
@@ -298,20 +285,18 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 			return -1;
 		}
 
-
 		/* Process echo cancellation */
 #if WEBRTC_AEC_USE_MOBILE == 1
 		status = WebRtcAecm_Process(echo->AEC_inst,
 							(WebRtc_Word16 *) (&rec_frm[i]),
-							(echo->NS_inst)?(WebRtc_Word16 *) (&echo->tmp_frame[i]):(WebRtc_Word16 *) (&rec_frm[i]),
-							(WebRtc_Word16 *) (&echo->tmp_frame2[i]),
+							(WebRtc_Word16 *) (&echo->tmp_frame[i]),
 							echo->blockLen10ms,
 							echo->echo_tail / tail_factor);
 #else
 		status = WebRtcAec_Process(echo->AEC_inst,
-							(echo->NS_inst)?(WebRtc_Word16 *) (&echo->tmp_frame[i]):(WebRtc_Word16 *) (&rec_frm[i]),
+							(WebRtc_Word16 *) (&rec_frm[i]),
 							NULL,
-							(WebRtc_Word16 *) (&echo->tmp_frame2[i]),
+							(WebRtc_Word16 *) (&echo->tmp_frame[i]),
 							NULL,
 							echo->blockLen10ms,
 							echo->echo_tail / tail_factor,
@@ -321,11 +306,26 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 			print_webrtc_aec_error("Process echo", echo->AEC_inst);
 			return -1;
 		}
+
+    	if(echo->NS_inst){
+			/* Noise suppression */
+			status = WebRtcNs_Process((NsHandle *)echo->NS_inst,
+									  (WebRtc_Word16 *) (&echo->tmp_frame[i]),
+									  NULL,
+									  (WebRtc_Word16 *) (&echo->tmp_frame2[i]),
+									  NULL);
+			if (status != 0) {
+				printf("%s:%d-Error suppressing noise", __FILE__, __LINE__);
+				return -1;
+			}
+    	}
     }
 
 
     /* Copy temporary buffer back to original rec_frm */
-    memcpy(rec_frm, echo->tmp_frame2, (echo->samples_per_frame)<<1);
+	memcpy(rec_frm, 
+			(echo->NS_inst)?(echo->tmp_frame2):(echo->tmp_frame),
+			(echo->samples_per_frame)<<1);
 
     return 0;
 }

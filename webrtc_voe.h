@@ -17,13 +17,15 @@
 #ifndef __WRTC_VOICE_ENGINE_H__
 #define __WRTC_VOICE_ENGINE_H__
 
-#define _WEBRTC_API_EXPORTS	// For DLL Building.
+//#define _WEBRTC_API_EXPORTS	// For DLL Building.
 #define _WEBRTC_FOR_PC
 
-#ifdef  _WEBRTC_API_EXPORTS
+#if		defined(_WEBRTC_API_EXPORTS)
 #define WEBRTC_API  __declspec(dllexport)
-#else
+#elif	defined(_WEBRTC_API_IMPORTS)
 #define WEBRTC_API  __declspec(dllimport)
+#else
+#define	WEBRTC_API
 #endif
 
 
