@@ -17,7 +17,7 @@
 #ifndef __WRTC_VOICE_ENGINE_H__
 #define __WRTC_VOICE_ENGINE_H__
 
-//#define _WEBRTC_API_EXPORTS	// For DLL Building.
+#define _WEBRTC_API_EXPORTS	// For DLL Building.
 #define _WEBRTC_FOR_PC
 
 #if		defined(_WEBRTC_API_EXPORTS)
@@ -38,6 +38,7 @@ typedef struct webrtc_ec
 {
 	void*		AEC_inst;
     void*		NS_inst;
+	void*		HP_FilterState;
     unsigned	samples_per_frame;
     unsigned	echo_tail;
     unsigned	echo_skew;

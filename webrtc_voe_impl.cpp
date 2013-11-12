@@ -16,6 +16,8 @@
 #include <assert.h>
 #include "webrtc_voe_impl.h"
 #include "common_audio/resampler/include/resampler.h"
+#include "webrtc/modules/audio_processing/splitting_filter.h"
+
 
 #ifndef WEBRTC_AEC_AGGRESSIVENESS
     #define WEBRTC_AEC_AGGRESSIVENESS kAecNlpAggressive	//kAecNlpConservative, kAecNlpModerate, kAecNlpAggressive
@@ -62,13 +64,137 @@
 
 bool webrtc_use_ns = WEBRTC_USE_NS;
 
-//-----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------//
 
 #define print_webrtc_aec_error(c,d)	_print_webrtc_aec_error(__FILE__, __LINE__, c, d)
 static void _print_webrtc_aec_error(const char* filename, int linenum, const char* tag, void *AEC_inst) {
 	unsigned status = W_WebRtcAec_get_error_code(AEC_inst);
     printf("%s:%d-WebRTC AEC ERROR (%s) %d\n", filename, linenum, tag, status);
 }
+
+//-----------------------------------------------------------------------------------//
+
+/*
+enum {
+  kSamplesPer8kHzChannel = 80,
+  kSamplesPer16kHzChannel = 160,
+  kSamplesPer32kHzChannel = 320
+};
+
+struct MixedAudioChannel {
+  MixedAudioChannel() {
+    memset(data, 0, sizeof(data));
+  }
+
+  int16_t data[kSamplesPer32kHzChannel];
+};
+
+struct SplitAudioChannel {
+  SplitAudioChannel() {
+    memset(low_pass_data, 0, sizeof(low_pass_data));
+    memset(high_pass_data, 0, sizeof(high_pass_data));
+    memset(analysis_filter_state1, 0, sizeof(analysis_filter_state1));
+    memset(analysis_filter_state2, 0, sizeof(analysis_filter_state2));
+    memset(synthesis_filter_state1, 0, sizeof(synthesis_filter_state1));
+    memset(synthesis_filter_state2, 0, sizeof(synthesis_filter_state2));
+  }
+
+  int16_t low_pass_data[kSamplesPer16kHzChannel];
+  int16_t high_pass_data[kSamplesPer16kHzChannel];
+
+  int32_t analysis_filter_state1[6];
+  int32_t analysis_filter_state2[6];
+  int32_t synthesis_filter_state1[6];
+  int32_t synthesis_filter_state2[6];
+};
+*/
+
+//-----------------------------------------------------------------------------------//
+//--- High Pass Filter ---//
+
+const int16_t kFilterCoefficients8kHz[5] =
+    {3798, -7596, 3798, 7807, -3733};
+
+const int16_t kFilterCoefficients[5] =
+    {4012, -8024, 4012, 8002, -3913};
+
+struct FilterState {
+  int16_t y[4];
+  int16_t x[2];
+  const int16_t* ba;
+};
+
+static int InitializeFilter(FilterState* hpf, int sample_rate_hz) {
+  assert(hpf != NULL);
+
+  if (sample_rate_hz == 8000) {
+    hpf->ba = kFilterCoefficients8kHz;
+  } else {
+    hpf->ba = kFilterCoefficients;
+  }
+
+  WebRtcSpl_MemSetW16(hpf->x, 0, 2);
+  WebRtcSpl_MemSetW16(hpf->y, 0, 4);
+
+  return 0;
+}
+
+
+static int Filter(FilterState* hpf, int16_t* data, int length) {
+  assert(hpf != NULL);
+
+  int32_t tmp_int32 = 0;
+  int16_t* y = hpf->y;
+  int16_t* x = hpf->x;
+  const int16_t* ba = hpf->ba;
+
+  for (int i = 0; i < length; i++) {
+    //  y[i] = b[0] * x[i] + b[1] * x[i-1] + b[2] * x[i-2]
+    //         + -a[1] * y[i-1] + -a[2] * y[i-2];
+
+    tmp_int32 =
+        WEBRTC_SPL_MUL_16_16(y[1], ba[3]); // -a[1] * y[i-1] (low part)
+    tmp_int32 +=
+        WEBRTC_SPL_MUL_16_16(y[3], ba[4]); // -a[2] * y[i-2] (low part)
+    tmp_int32 = (tmp_int32 >> 15);
+    tmp_int32 +=
+        WEBRTC_SPL_MUL_16_16(y[0], ba[3]); // -a[1] * y[i-1] (high part)
+    tmp_int32 +=
+        WEBRTC_SPL_MUL_16_16(y[2], ba[4]); // -a[2] * y[i-2] (high part)
+    tmp_int32 = (tmp_int32 << 1);
+
+    tmp_int32 += WEBRTC_SPL_MUL_16_16(data[i], ba[0]); // b[0]*x[0]
+    tmp_int32 += WEBRTC_SPL_MUL_16_16(x[0], ba[1]);    // b[1]*x[i-1]
+    tmp_int32 += WEBRTC_SPL_MUL_16_16(x[1], ba[2]);    // b[2]*x[i-2]
+
+    // Update state (input part)
+    x[1] = x[0];
+    x[0] = data[i];
+
+    // Update state (filtered part)
+    y[2] = y[0];
+    y[3] = y[1];
+    y[0] = static_cast<int16_t>(tmp_int32 >> 13);
+    y[1] = static_cast<int16_t>((tmp_int32 -
+        WEBRTC_SPL_LSHIFT_W32(static_cast<int32_t>(y[0]), 13)) << 2);
+
+    // Rounding in Q12, i.e. add 2^11
+    tmp_int32 += 2048;
+
+    // Saturate (to 2^27) so that the HP filtered signal does not overflow
+    tmp_int32 = WEBRTC_SPL_SAT(static_cast<int32_t>(134217727),
+                               tmp_int32,
+                               static_cast<int32_t>(-134217728));
+
+    // Convert back to Q0 and use rounding
+    data[i] = (int16_t)WEBRTC_SPL_RSHIFT_W32(tmp_int32, 12);
+
+  }
+
+  return 0;
+}
+
+//-----------------------------------------------------------------------------------//
 
 /*
  * Create the AEC.
@@ -89,6 +215,7 @@ extern "C" int WEBRTC_API webrtc_aec_create(
 
     echo = (webrtc_ec *) malloc(sizeof(webrtc_ec));
     assert(echo != NULL);
+	memset(echo, 0, sizeof(webrtc_ec));
 
     // Alloc memory
     status = W_WebRtcAec_Create(&echo->AEC_inst);
@@ -169,6 +296,10 @@ extern "C" int WEBRTC_API webrtc_aec_create(
 		echo->NS_inst = NULL;
 	}
 
+	// Initialize High Pass Filter
+	echo->HP_FilterState = (FilterState*)malloc(sizeof(FilterState));
+	InitializeFilter((FilterState*)(echo->HP_FilterState), clock_rate);
+
     echo->samples_per_frame = samples_per_frame;
     echo->echo_tail = tail_ms;
     echo->echo_skew = 0;
@@ -203,8 +334,9 @@ extern "C" int WEBRTC_API webrtc_aec_destroy(void *state )
         WebRtcNs_Free((NsHandle *)echo->NS_inst);
         echo->NS_inst = NULL;
     }
-    if (echo->tmp_frame ) SAFE_FREE(echo->tmp_frame );
-    if (echo->tmp_frame2) SAFE_FREE(echo->tmp_frame2);
+    SAFE_FREE(echo->tmp_frame );
+    SAFE_FREE(echo->tmp_frame2);
+	SAFE_FREE(echo->HP_FilterState);
 
 	SAFE_FREE(echo);
 
@@ -266,7 +398,7 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 {
     webrtc_ec *echo = (webrtc_ec*) state;
     int status;
-    unsigned i, tail_factor;
+    unsigned i; //, tail_factor;
 
     /* Sanity checks */
     assert(echo && rec_frm && play_frm && options==0 && reserved==NULL);
@@ -275,7 +407,7 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 	}
 	echo->samples_per_frame = framing;	//for better flexibility, framing can be changed dynamically.
 
-	tail_factor = echo->samples_per_frame / echo->blockLen10ms;
+	//tail_factor = echo->samples_per_frame / echo->blockLen10ms;
     for(i=0; i < echo->samples_per_frame; i+= echo->blockLen10ms) {
 
 		/* Feed farend buffer */
@@ -284,6 +416,9 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 			print_webrtc_aec_error("buffer farend", echo->AEC_inst);
 			return -1;
 		}
+
+		/* high pass filter */
+		Filter((FilterState*)(echo->HP_FilterState), &rec_frm[i], echo->blockLen10ms);
 
 		/* Process echo cancellation */
 #if WEBRTC_AEC_USE_MOBILE == 1
@@ -299,7 +434,7 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 							(WebRtc_Word16 *) (&echo->tmp_frame[i]),
 							NULL,
 							echo->blockLen10ms,
-							echo->echo_tail / tail_factor,
+							(options==0?echo->echo_tail:options),	// echo->echo_tail / tail_factor,
 							echo->echo_skew);
 #endif
 		if(status != 0){
