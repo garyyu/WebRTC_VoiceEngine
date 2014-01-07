@@ -14,8 +14,6 @@ This project depends on WebRTC project, which I put on my folder "C:\Users\garyy
 	http://www.webrtc.org/reference/getting-started
 	http://www.webrtc.org/reference/getting-started/prerequisite-sw
 
-For friends who would like to work together in WebRTC Voice & Video Engine world, please follow me at Google+ and indicate yourself as WebRTC fans :)
-	https://plus.google.com/102135341911165403454/about
 
 
 
