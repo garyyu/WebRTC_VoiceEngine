@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{81E50AE9-A005-4B5B-B3FB-8496668FAEE4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>WebRTC_VoiceEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(WEBRTC_TRUNK_DIR);$(WEBRTC_TRUNK_DIR)\webrtc;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\video_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include\mock;$(WEBRTC_TRUNK_DIR)\system_wrappers\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(WEBRTC_TRUNK_DIR)\build\Debug;$(WEBRTC_TRUNK_DIR)\build\Debug\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libyuv.lib;CNG.lib;G711.lib;G722.lib;NetEq.lib;NetEq4.lib;NetEq4TestTools.lib;NetEqTestTools.lib;PCM16B.lib;acm2.lib;audio_coding_module.lib;audio_conference_mixer.lib;audio_device.lib;audio_processing.lib;audio_processing_sse2.lib;audioproc_debug_proto.lib;audioproc_unittest_proto.lib;bitrate_controller.lib;channel_transport.lib;command_line_parser.lib;common_audio.lib;common_audio_sse2.lib;common_video.lib;crnspr.lib;crnss.lib;desktop_capture.lib;desktop_capture_differ_sse2.lib;directshow_baseclasses.lib;expat.lib;frame_editing_lib.lib;frame_generator.lib;genperf_libs.lib;iLBC.lib;iSAC.lib;iSACFix.lib;icui18n.lib;icuuc.lib;jsoncpp.lib;libjingle.lib;libjingle_media.lib;libjingle_p2p.lib;libjingle_peerconnection.lib;libjingle_sound.lib;libjingle_xmpphelp.lib;libjpeg.lib;libsrtp.lib;libtest.lib;libvietest.lib;libvpx.lib;libvpx_asm_offsets_vp8.lib;libvpx_intrinsics_mmx.lib;libvpx_intrinsics_sse2.lib;libvpx_intrinsics_ssse3.lib;media_file.lib;metrics.lib;neteq_unittest_tools.lib;nss_static.lib;opus.lib;paced_sender.lib;protobuf_full_do_not_use.lib;protobuf_lite.lib;rbe_components.lib;remote_bitrate_estimator.lib;rtp_rtcp.lib;sqlite3.lib;system_wrappers.lib;video_capture_module.lib;video_codecs_test_framework.lib;video_coding_utility.lib;video_engine_core.lib;video_processing.lib;video_processing_sse2.lib;video_quality_analysis.lib;video_render_module.lib;voice_engine.lib;webrtc.lib;webrtc_i420.lib;webrtc_opus.lib;webrtc_test_common.lib;webrtc_utility.lib;webrtc_video_coding.lib;webrtc_vp8.lib;winmm.lib;msdmo.lib;dmoguids.lib;wmcodecdspuuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>libcmtd;msvcprtd;</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(WEBRTC_TRUNK_DIR);$(WEBRTC_TRUNK_DIR)\webrtc;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\video_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include\mock;$(WEBRTC_TRUNK_DIR)\webrtc\system_wrappers\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(WEBRTC_TRUNK_DIR)\build\Release;$(WEBRTC_TRUNK_DIR)\build\Release\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libyuv.lib;CNG.lib;G711.lib;G722.lib;NetEq.lib;NetEq4.lib;NetEq4TestTools.lib;NetEqTestTools.lib;PCM16B.lib;acm2.lib;audio_coding_module.lib;audio_conference_mixer.lib;audio_device.lib;audio_processing.lib;audio_processing_sse2.lib;audioproc_debug_proto.lib;audioproc_unittest_proto.lib;bitrate_controller.lib;channel_transport.lib;command_line_parser.lib;common_audio.lib;common_audio_sse2.lib;common_video.lib;crnspr.lib;crnss.lib;desktop_capture.lib;desktop_capture_differ_sse2.lib;directshow_baseclasses.lib;expat.lib;frame_editing_lib.lib;frame_generator.lib;genperf_libs.lib;iLBC.lib;iSAC.lib;iSACFix.lib;icui18n.lib;icuuc.lib;jsoncpp.lib;libjingle.lib;libjingle_media.lib;libjingle_p2p.lib;libjingle_peerconnection.lib;libjingle_sound.lib;libjingle_xmpphelp.lib;libjpeg.lib;libsrtp.lib;libtest.lib;libvietest.lib;libvpx.lib;libvpx_asm_offsets_vp8.lib;libvpx_intrinsics_mmx.lib;libvpx_intrinsics_sse2.lib;libvpx_intrinsics_ssse3.lib;media_file.lib;metrics.lib;neteq_unittest_tools.lib;nss_static.lib;opus.lib;paced_sender.lib;protobuf_full_do_not_use.lib;protobuf_lite.lib;rbe_components.lib;remote_bitrate_estimator.lib;rtp_rtcp.lib;sqlite3.lib;system_wrappers.lib;video_capture_module.lib;video_codecs_test_framework.lib;video_coding_utility.lib;video_engine_core.lib;video_processing.lib;video_processing_sse2.lib;video_quality_analysis.lib;video_render_module.lib;voice_engine.lib;webrtc.lib;webrtc_i420.lib;webrtc_opus.lib;webrtc_test_common.lib;webrtc_utility.lib;webrtc_video_coding.lib;webrtc_vp8.lib;Winmm.lib;dmoguids.lib;wmcodecdspuuid.lib;strmiids.lib;msdmo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;msvcprt</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\demo_main.cpp" />
+    <ClCompile Include="..\my_level_indicator.cc" />
+    <ClCompile Include="..\wasapi.cpp" />
+    <ClCompile Include="..\webrtc_voe_impl.cpp" />
+    <ClCompile Include="..\webrtc_volume_control_impl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\wasapi.h" />
+    <ClInclude Include="..\webrtc_voe.h" />
+    <ClInclude Include="..\webrtc_voe_impl.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

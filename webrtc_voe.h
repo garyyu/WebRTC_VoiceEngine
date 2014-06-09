@@ -55,6 +55,63 @@ typedef struct webrtc_ec
 #endif
 
 /************************************************************************/
+/*                        Volume Control API                            */
+/************************************************************************/
+
+class WEBRTC_API WebRTCVolumeCtlImpl
+{
+private:
+    void* m_voe;			//VoiceEngine*
+    void* m_base;			//VoEBase*
+    void* volume_control;	//VoEVolumeControl*
+	//void* m_apm;			//VoEAudioProcessing*
+	//void* m_hardware;		//VoEHardware*
+
+public:
+
+    WebRTCVolumeCtlImpl();
+    ~WebRTCVolumeCtlImpl();
+
+    int webrtc_voe_init();
+    void webrtc_voe_deinit();
+
+	/*--- Microphone Level Control. Valid range is [0,255]. ---*/
+	int SetMicVolume(unsigned int level);	
+	int GetMicVolume(unsigned int &level);		
+
+	/*--- Speaker Level Control. Valid range is [0,255]. ---*/
+	int SetSpkVolume(unsigned int volume);	
+	int GetSpkVolume(unsigned int &volume);				
+};
+
+
+class WEBRTC_API MyAudioLevel
+{
+public:
+    MyAudioLevel();
+    ~MyAudioLevel();
+
+    signed char Level() const;
+    signed short Count() const;
+    signed short LevelFullRange() const;
+    void Clear();
+
+    void ComputeLevel(const signed short* audioFrame, int length);
+
+private:
+    enum { kUpdateFrequency = 10};
+
+    signed short _absMax;
+    signed short _count;
+    signed char _currentLevel;
+    signed short _currentLevelFullRange;
+
+	signed short My_WebRtcSpl_MaxAbsValueW16C(const signed short* vector, int length);
+
+};
+
+
+/************************************************************************/
 /*                              Main AEC API                            */
 /************************************************************************/
 

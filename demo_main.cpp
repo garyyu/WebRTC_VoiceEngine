@@ -1,3 +1,17 @@
+/*
+ *  Copyright (c) 2013 Gary Yu. All Rights Reserved.
+ *
+ *	URL: https://github.com/garyyu/WebRTC_VoiceEngine
+ *
+ *  Use of this source code is governed by a New BSD license which can be found in the LICENSE file
+ *  in the root of the source tree. Refer to README.md.
+ *  For WebRTC License & Patents information, please read files LICENSE.webrtc and PATENTS.webrtc.
+ */
+
+/*
+ * This file contains the Usage Demo of this WebRTC AEC.
+ *
+ */
 
 #include <Windows.h>
 #include <iostream>
