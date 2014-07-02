@@ -48,6 +48,22 @@ typedef struct webrtc_ec
     int16_t*	tmp_frame2;
 } webrtc_ec;
 
+
+typedef struct {
+  int instant;
+  int average;
+  int max;
+  int min;
+} MyAecLevel;
+
+typedef struct {
+  MyAecLevel rerl;
+  MyAecLevel erl;
+  MyAecLevel erle;
+  MyAecLevel aNlp;
+} MyAecMetrics;
+
+
 #if defined(_WEBRTC_FOR_PC)
 #define WEBRTC_AEC_USE_MOBILE 0
 #else
@@ -132,6 +148,10 @@ extern "C" int  WEBRTC_API		webrtc_aec_cancel_echo(void *state,
 						unsigned framing,
                         unsigned options,
                         void *reserved );
+
+extern "C" int  WEBRTC_API		webrtc_aec_get_metrics( 
+						void *state, 
+						void *_aec_metrics );
 
 
 /************************************************************************/

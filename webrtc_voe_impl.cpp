@@ -466,6 +466,28 @@ extern "C" int WEBRTC_API webrtc_aec_cancel_echo( void *state,
 }
 
 
+/*
+ * Inquiry echo cancellation metrics.
+ */
+extern "C" int WEBRTC_API webrtc_aec_get_metrics( void *state, void *_aec_metrics )
+{
+    webrtc_ec *echo = (webrtc_ec*) state;
+
+    /* Sanity checks */
+    assert(echo && rec_frm && play_frm && options==0 && reserved==NULL);
+	if ((echo==NULL) || (_aec_metrics==NULL)){
+		return -1;
+	}
+
+	if (0 == WebRtcAec_GetMetrics(echo->AEC_inst, (AecMetrics*)_aec_metrics) ){
+		return 0;
+	}
+	else{
+		return -1;
+	}
+}
+
+
 /**********************************************************************************************
  *					WebRTC Resampler API                                                      *
  **********************************************************************************************/
