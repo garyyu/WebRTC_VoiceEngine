@@ -179,6 +179,21 @@ void LocalFileTest()
 		fwrite(file_buffer, sizeof(int16_t), 2*samples_per_frame, wfile);
 	}
 
+	//Get the AEC Status
+	MyAecMetrics aecMetrics;
+	if (0 == webrtc_aec_get_metrics(echo, &aecMetrics))
+	{
+		printf("ERL (Ave/Max/Min)=%d/%d/%d \n",aecMetrics.erl.average,aecMetrics.erl.max,aecMetrics.erl.min);
+		printf("ERLE(Ave/Max/Min)=%d/%d/%d \n",aecMetrics.erle.average,aecMetrics.erle.max,aecMetrics.erle.min); 
+		printf("aNLP(Ave/Max/Min)=%d/%d/%d \n",aecMetrics.aNlp.average,aecMetrics.aNlp.max,aecMetrics.aNlp.min); 
+	}
+
+	int median_delay, standard_delay;
+	if (0 == webrtc_aec_get_delay_metrics(echo, &median_delay, &standard_delay))
+	{
+		printf("WebRTC AEC Median Delay Estimation: %d(ms), Std Delay Estimation: %d(ms)\n", median_delay, standard_delay);
+	}
+
 	webrtc_aec_destroy( echo );
 
 	fclose(rfile); rfile=NULL;

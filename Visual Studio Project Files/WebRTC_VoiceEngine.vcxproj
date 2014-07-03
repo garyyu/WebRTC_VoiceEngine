@@ -17,15 +17,17 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Static</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -50,14 +52,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(WEBRTC_TRUNK_DIR);$(WEBRTC_TRUNK_DIR)\webrtc;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\video_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include\mock;$(WEBRTC_TRUNK_DIR)\system_wrappers\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WEBRTC_TRUNK_DIR);$(WEBRTC_TRUNK_DIR)\webrtc;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\video_engine\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport\include;$(WEBRTC_TRUNK_DIR)\webrtc\test\channel_transport;$(WEBRTC_TRUNK_DIR)\webrtc\voice_engine\include\mock;$(WEBRTC_TRUNK_DIR)\webrtc\system_wrappers\interface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(WEBRTC_TRUNK_DIR)\build\Debug;$(WEBRTC_TRUNK_DIR)\build\Debug\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>libyuv.lib;CNG.lib;G711.lib;G722.lib;NetEq.lib;NetEq4.lib;NetEq4TestTools.lib;NetEqTestTools.lib;PCM16B.lib;acm2.lib;audio_coding_module.lib;audio_conference_mixer.lib;audio_device.lib;audio_processing.lib;audio_processing_sse2.lib;audioproc_debug_proto.lib;audioproc_unittest_proto.lib;bitrate_controller.lib;channel_transport.lib;command_line_parser.lib;common_audio.lib;common_audio_sse2.lib;common_video.lib;crnspr.lib;crnss.lib;desktop_capture.lib;desktop_capture_differ_sse2.lib;directshow_baseclasses.lib;expat.lib;frame_editing_lib.lib;frame_generator.lib;genperf_libs.lib;iLBC.lib;iSAC.lib;iSACFix.lib;icui18n.lib;icuuc.lib;jsoncpp.lib;libjingle.lib;libjingle_media.lib;libjingle_p2p.lib;libjingle_peerconnection.lib;libjingle_sound.lib;libjingle_xmpphelp.lib;libjpeg.lib;libsrtp.lib;libtest.lib;libvietest.lib;libvpx.lib;libvpx_asm_offsets_vp8.lib;libvpx_intrinsics_mmx.lib;libvpx_intrinsics_sse2.lib;libvpx_intrinsics_ssse3.lib;media_file.lib;metrics.lib;neteq_unittest_tools.lib;nss_static.lib;opus.lib;paced_sender.lib;protobuf_full_do_not_use.lib;protobuf_lite.lib;rbe_components.lib;remote_bitrate_estimator.lib;rtp_rtcp.lib;sqlite3.lib;system_wrappers.lib;video_capture_module.lib;video_codecs_test_framework.lib;video_coding_utility.lib;video_engine_core.lib;video_processing.lib;video_processing_sse2.lib;video_quality_analysis.lib;video_render_module.lib;voice_engine.lib;webrtc.lib;webrtc_i420.lib;webrtc_opus.lib;webrtc_test_common.lib;webrtc_utility.lib;webrtc_video_coding.lib;webrtc_vp8.lib;winmm.lib;msdmo.lib;dmoguids.lib;wmcodecdspuuid.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>libcmtd;msvcprtd;</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>msvcprtd;</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -78,7 +80,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(WEBRTC_TRUNK_DIR)\build\Release;$(WEBRTC_TRUNK_DIR)\build\Release\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>libyuv.lib;CNG.lib;G711.lib;G722.lib;NetEq.lib;NetEq4.lib;NetEq4TestTools.lib;NetEqTestTools.lib;PCM16B.lib;acm2.lib;audio_coding_module.lib;audio_conference_mixer.lib;audio_device.lib;audio_processing.lib;audio_processing_sse2.lib;audioproc_debug_proto.lib;audioproc_unittest_proto.lib;bitrate_controller.lib;channel_transport.lib;command_line_parser.lib;common_audio.lib;common_audio_sse2.lib;common_video.lib;crnspr.lib;crnss.lib;desktop_capture.lib;desktop_capture_differ_sse2.lib;directshow_baseclasses.lib;expat.lib;frame_editing_lib.lib;frame_generator.lib;genperf_libs.lib;iLBC.lib;iSAC.lib;iSACFix.lib;icui18n.lib;icuuc.lib;jsoncpp.lib;libjingle.lib;libjingle_media.lib;libjingle_p2p.lib;libjingle_peerconnection.lib;libjingle_sound.lib;libjingle_xmpphelp.lib;libjpeg.lib;libsrtp.lib;libtest.lib;libvietest.lib;libvpx.lib;libvpx_asm_offsets_vp8.lib;libvpx_intrinsics_mmx.lib;libvpx_intrinsics_sse2.lib;libvpx_intrinsics_ssse3.lib;media_file.lib;metrics.lib;neteq_unittest_tools.lib;nss_static.lib;opus.lib;paced_sender.lib;protobuf_full_do_not_use.lib;protobuf_lite.lib;rbe_components.lib;remote_bitrate_estimator.lib;rtp_rtcp.lib;sqlite3.lib;system_wrappers.lib;video_capture_module.lib;video_codecs_test_framework.lib;video_coding_utility.lib;video_engine_core.lib;video_processing.lib;video_processing_sse2.lib;video_quality_analysis.lib;video_render_module.lib;voice_engine.lib;webrtc.lib;webrtc_i420.lib;webrtc_opus.lib;webrtc_test_common.lib;webrtc_utility.lib;webrtc_video_coding.lib;webrtc_vp8.lib;Winmm.lib;dmoguids.lib;wmcodecdspuuid.lib;strmiids.lib;msdmo.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>LIBCMT;msvcprt</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmt;msvcprt</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

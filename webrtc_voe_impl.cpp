@@ -238,8 +238,6 @@ extern "C" int WEBRTC_API webrtc_aec_create(
     }
 
 	// Set configuration -- sample code for future use
-	// For now keep default values
-/*
 #if WEBRTC_AEC_USE_MOBILE == 1
 	AecmConfig aecm_config;
 	aecm_config.cngMode = AecmTrue;
@@ -249,23 +247,24 @@ extern "C" int WEBRTC_API webrtc_aec_create(
     if(status != 0) {
         print_webrtc_aec_error("Init config", echo->AEC_inst);
         WebRtcAec_Free(echo->AEC_inst);
-    	return PJ_EBUG;
+		echo->AEC_inst = NULL;
+    	return -1;	// API Failure
     }
 #else
     AecConfig aec_config;
-    aec_config.nlpMode = PJMEDIA_WEBRTC_AEC_AGGRESSIVENESS;
+    aec_config.nlpMode = WEBRTC_AEC_AGGRESSIVENESS;
     aec_config.skewMode = kAecTrue;
-    aec_config.metricsMode = kAecFalse;
-    aec_config.delay_logging = kAecFalse;
+    aec_config.metricsMode = kAecTrue;
+    aec_config.delay_logging = kAecTrue;
 
     status = WebRtcAec_set_config(echo->AEC_inst, aec_config);
     if(status != 0) {
         print_webrtc_aec_error("Init config", echo->AEC_inst);
         WebRtcAec_Free(echo->AEC_inst);
-    	return PJ_EBUG;
+		echo->AEC_inst = NULL;
+    	return -1;	// API Failure
     }
 #endif
-*/
 
 	if (webrtc_use_ns == VOE_TRUE){
 		status = WebRtcNs_Create((NsHandle **)&echo->NS_inst);
@@ -373,7 +372,8 @@ extern "C" void WEBRTC_API webrtc_aec_reset(void *state )
         AecConfig aec_config;
         aec_config.nlpMode = WEBRTC_AEC_AGGRESSIVENESS;
         aec_config.skewMode = kAecTrue;
-        aec_config.metricsMode = kAecFalse;
+        aec_config.metricsMode = kAecTrue;
+		aec_config.delay_logging = kAecTrue;
 
         status = WebRtcAec_set_config(echo->AEC_inst, aec_config);
         if(status != 0) {
@@ -474,7 +474,7 @@ extern "C" int WEBRTC_API webrtc_aec_get_metrics( void *state, void *_aec_metric
     webrtc_ec *echo = (webrtc_ec*) state;
 
     /* Sanity checks */
-    assert(echo && rec_frm && play_frm && options==0 && reserved==NULL);
+    assert(echo && _aec_metrics);
 	if ((echo==NULL) || (_aec_metrics==NULL)){
 		return -1;
 	}
@@ -487,6 +487,26 @@ extern "C" int WEBRTC_API webrtc_aec_get_metrics( void *state, void *_aec_metric
 	}
 }
 
+/*
+ * Inquiry echo cancellation delay metrics.
+ */
+extern "C" int WEBRTC_API webrtc_aec_get_delay_metrics( void *state, int* median, int* std )
+{
+    webrtc_ec *echo = (webrtc_ec*) state;
+
+    /* Sanity checks */
+    assert(echo && median && std);
+	if ((echo==NULL) || (median==NULL) || (std==NULL)){
+		return -1;
+	}
+
+	if (0 == WebRtcAec_GetDelayMetrics(echo->AEC_inst, median, std) ){
+		return 0;
+	}
+	else{
+		return -1;
+	}
+}
 
 /**********************************************************************************************
  *					WebRTC Resampler API                                                      *

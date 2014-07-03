@@ -153,6 +153,10 @@ extern "C" int  WEBRTC_API		webrtc_aec_get_metrics(
 						void *state, 
 						void *_aec_metrics );
 
+extern "C" int  WEBRTC_API		webrtc_aec_get_delay_metrics( 
+						void *state, 
+						int* median, 
+						int* std );
 
 /************************************************************************/
 /*                              Main Resampler API                      */
